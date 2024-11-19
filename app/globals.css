@@ -116,3 +116,9 @@ body * {
   -webkit-context-menu: none;
   -webkit-touch-callout: none;
 }
+
+@media (max-width: 768px) {
+  body {
+    overflow: hidden;
+  }
+}

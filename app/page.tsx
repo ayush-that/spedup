@@ -13,53 +13,45 @@ export default function Home() {
   const [hasStarted, setHasStarted] = useState(false);
   const [songHistory, setSongHistory] = useState<number[]>([]);
 
-  const handleSongEndRef = useRef<() => void>();
-  const handleWaitingRef = useRef<() => void>();
-  const handlePlayingRef = useRef<() => void>();
-
   const nextRandomSongRef = useRef<() => void>();
 
-  useEffect(() => {
-    handleSongEndRef.current = () => {
-      if (nextRandomSongRef.current) {
-        nextRandomSongRef.current();
-      }
-    };
+  const handleSongEnd = useCallback(() => {
+    if (nextRandomSongRef.current) {
+      nextRandomSongRef.current();
+    }
+  }, []);
 
-    handleWaitingRef.current = () => {
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleWaiting = () => {
       setIsBuffering(true);
     };
 
-    handlePlayingRef.current = () => {
+    const handlePlaying = () => {
       setIsBuffering(false);
     };
-  }, []);
+
+    audio.addEventListener("ended", handleSongEnd);
+    audio.addEventListener("waiting", handleWaiting);
+    audio.addEventListener("playing", handlePlaying);
+
+    return () => {
+      audio.removeEventListener("ended", handleSongEnd);
+      audio.removeEventListener("waiting", handleWaiting);
+      audio.removeEventListener("playing", handlePlaying);
+    };
+  }, [handleSongEnd]);
 
   const changeSong = useCallback(
     async (newIndex: number, addToHistory: boolean = true) => {
       try {
         if (audioRef.current) {
           audioRef.current.pause();
-          if (handleSongEndRef.current) {
-            audioRef.current.removeEventListener(
-              "ended",
-              handleSongEndRef.current
-            );
-          }
-          if (handleWaitingRef.current) {
-            audioRef.current.removeEventListener(
-              "waiting",
-              handleWaitingRef.current
-            );
-          }
-          if (handlePlayingRef.current) {
-            audioRef.current.removeEventListener(
-              "playing",
-              handlePlayingRef.current
-            );
-          }
           audioRef.current.src = "";
           audioRef.current.load();
+          audioRef.current.removeEventListener("ended", handleSongEnd);
         }
 
         if (addToHistory) {
@@ -69,16 +61,7 @@ export default function Home() {
         if (songs[newIndex]) {
           const newAudio = new Audio(songs[newIndex].src);
           newAudio.volume = volume;
-
-          if (handleSongEndRef.current) {
-            newAudio.addEventListener("ended", handleSongEndRef.current);
-          }
-          if (handleWaitingRef.current) {
-            newAudio.addEventListener("waiting", handleWaitingRef.current);
-          }
-          if (handlePlayingRef.current) {
-            newAudio.addEventListener("playing", handlePlayingRef.current);
-          }
+          newAudio.addEventListener("ended", handleSongEnd);
 
           audioRef.current = newAudio;
           setCurrentSong(newIndex);
@@ -91,7 +74,7 @@ export default function Home() {
         console.error("Error changing song:", error);
       }
     },
-    [currentSong, songs, volume]
+    [currentSong, songs, volume, handleSongEnd]
   );
 
   const nextRandomSong = useCallback(() => {
@@ -171,27 +154,10 @@ export default function Home() {
         audioRef.current.pause();
         audioRef.current.src = "";
         audioRef.current.load();
-        if (handleSongEndRef.current) {
-          audioRef.current.removeEventListener(
-            "ended",
-            handleSongEndRef.current
-          );
-        }
-        if (handleWaitingRef.current) {
-          audioRef.current.removeEventListener(
-            "waiting",
-            handleWaitingRef.current
-          );
-        }
-        if (handlePlayingRef.current) {
-          audioRef.current.removeEventListener(
-            "playing",
-            handlePlayingRef.current
-          );
-        }
+        audioRef.current.removeEventListener("ended", handleSongEnd);
       }
     };
-  }, []);
+  }, [handleSongEnd]);
 
   useEffect(() => {
     const fetchSongs = async () => {
@@ -220,7 +186,7 @@ export default function Home() {
       >
         <source src="/videos/anime-visuals.mp4" type="video/mp4" />
       </video>
-      <div className="absolute bottom-0 left-0 p-4">
+      <div className="absolute top-0 left-0 p-4">
         <h2 className="text-white pb-9 text-lg font-thin">
           {!hasStarted
             ? "Press space to play"

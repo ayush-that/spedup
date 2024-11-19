@@ -58,6 +58,7 @@ export default {
       },
       fontFamily: {
         sans: ["JetBrains Mono", "monospace"],
+        mono: ["JetBrains Mono", "monospace"],
       },
     },
   },

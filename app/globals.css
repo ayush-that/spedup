@@ -123,57 +123,36 @@ body * {
   }
 }
 
-/* Subtle static drop shadow for white icon with soft neutral backdrop */
 .icon-neon-glow {
-  filter: drop-shadow(0 0 1px #ffffff)
-    /* Soft White Highlight */
-    drop-shadow(0 0 3px rgba(200, 200, 255, 0.15))
-    /* Cool Blue Backdrop */
-    drop-shadow(0 0 5px rgba(200, 200, 255, 0.1));
-  /* Faint Cool Glow */
+  filter: drop-shadow(0 0 1px #ffffff) drop-shadow(0 0 3px rgba(200, 200, 255, 0.15)) drop-shadow(0 0 5px rgba(200, 200, 255, 0.1));
 }
 
-/* Keyframes for slow and attractive multi-colored animation */
 @keyframes vibrantGlow {
   0% {
-    filter: drop-shadow(0 0 1px #ff99ff)
-      /* Soft Pink */
-      drop-shadow(0 0 3px rgba(255, 153, 255, 0.4));
+    filter: drop-shadow(0 0 1px #ff99ff) drop-shadow(0 0 3px rgba(255, 153, 255, 0.4));
   }
 
   20% {
-    filter: drop-shadow(0 0 1px #00ffcc)
-      /* Teal */
-      drop-shadow(0 0 3px rgba(0, 255, 204, 0.4));
+    filter: drop-shadow(0 0 1px #00ffcc) drop-shadow(0 0 3px rgba(0, 255, 204, 0.4));
   }
 
   40% {
-    filter: drop-shadow(0 0 1px #ffcc00)
-      /* Golden Yellow */
-      drop-shadow(0 0 3px rgba(255, 204, 0, 0.4));
+    filter: drop-shadow(0 0 1px #ffcc00) drop-shadow(0 0 3px rgba(255, 204, 0, 0.4));
   }
 
   60% {
-    filter: drop-shadow(0 0 1px #ff5555)
-      /* Bright Red */
-      drop-shadow(0 0 3px rgba(255, 85, 85, 0.4));
+    filter: drop-shadow(0 0 1px #ff5555) drop-shadow(0 0 3px rgba(255, 85, 85, 0.4));
   }
 
   80% {
-    filter: drop-shadow(0 0 1px #99ccff)
-      /* Soft Blue */
-      drop-shadow(0 0 3px rgba(153, 204, 255, 0.4));
+    filter: drop-shadow(0 0 1px #99ccff) drop-shadow(0 0 3px rgba(153, 204, 255, 0.4));
   }
 
   100% {
-    filter: drop-shadow(0 0 1px #ff99ff)
-      /* Back to Soft Pink */
-      drop-shadow(0 0 3px rgba(255, 153, 255, 0.4));
+    filter: drop-shadow(0 0 1px #ff99ff) drop-shadow(0 0 3px rgba(255, 153, 255, 0.4));
   }
 }
 
-/* Slower and vibrant animation for font glow */
 .font-neon-glow {
   animation: vibrantGlow 5s infinite ease-in-out;
-  /* Slowed down with smooth transitions */
 }

@@ -19,7 +19,6 @@ export default function Home() {
 
   const nextRandomSongRef = useRef<() => void>();
 
-  // Initialize handler functions
   useEffect(() => {
     handleSongEndRef.current = () => {
       if (nextRandomSongRef.current) {
@@ -64,7 +63,6 @@ export default function Home() {
         }
 
         if (addToHistory) {
-          // Add the current song to the history before changing
           setSongHistory((prevHistory) => [...prevHistory, currentSong]);
         }
 
@@ -72,7 +70,6 @@ export default function Home() {
           const newAudio = new Audio(songs[newIndex].src);
           newAudio.volume = volume;
 
-          // Attach event listeners using the handlers from refs
           if (handleSongEndRef.current) {
             newAudio.addEventListener("ended", handleSongEndRef.current);
           }
@@ -97,7 +94,6 @@ export default function Home() {
     [currentSong, songs, volume]
   );
 
-  // Define nextRandomSong and store it in ref
   const nextRandomSong = useCallback(() => {
     if (songs.length > 0) {
       const nextSongIndex = getRandomIndex(songs.length);
@@ -109,10 +105,8 @@ export default function Home() {
     nextRandomSongRef.current = nextRandomSong;
   }, [nextRandomSong]);
 
-  // Define togglePlayPause function
   const togglePlayPause = useCallback(async () => {
     if (!audioRef.current && songs.length > 0) {
-      // If audio is not initialized, start playing the current song
       await changeSong(currentSong);
       return;
     }
@@ -133,7 +127,6 @@ export default function Home() {
     }
   }, [isPlaying, songs.length, changeSong, currentSong]);
 
-  // Define previousSong function
   const previousSong = useCallback(() => {
     setSongHistory((prevHistory) => {
       if (prevHistory.length > 0) {
@@ -145,10 +138,8 @@ export default function Home() {
     });
   }, [changeSong]);
 
-  // Define getRandomIndex helper function
   const getRandomIndex = (length: number) => Math.floor(Math.random() * length);
 
-  // Define nextRandomSongCallback for MediaControls
   const nextRandomSongCallback = useCallback(() => {
     if (songs.length > 0) {
       const nextSongIndex = getRandomIndex(songs.length);
@@ -156,7 +147,6 @@ export default function Home() {
     }
   }, [songs.length, changeSong]);
 
-  // Handle keyboard events
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.code === "Space" && !e.repeat) {
@@ -175,14 +165,12 @@ export default function Home() {
     return () => document.removeEventListener("keydown", handleKeyPress);
   }, [togglePlayPause, nextRandomSongCallback, previousSong]);
 
-  // Cleanup on component unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
         audioRef.current.load();
-        // Remove event listeners
         if (handleSongEndRef.current) {
           audioRef.current.removeEventListener(
             "ended",
@@ -205,7 +193,6 @@ export default function Home() {
     };
   }, []);
 
-  // Fetch songs on component mount
   useEffect(() => {
     const fetchSongs = async () => {
       try {
@@ -239,7 +226,7 @@ export default function Home() {
             ? 'press "space" to play'
             : isBuffering
             ? "Buffering..."
-            : songs[currentSong]?.title}
+            : `${songs[currentSong]?.title}...`}
         </h2>
         <MediaControls
           isPlaying={isPlaying}

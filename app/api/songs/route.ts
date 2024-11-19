@@ -2,11 +2,9 @@ import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
-// Force static generation
 export const dynamic = "force-static";
 export const revalidate = false;
 
-// This function runs at build time
 async function getSongs() {
   const songsDir = path.join(process.cwd(), "public", "songs");
   const files = await fs.readdir(songsDir);

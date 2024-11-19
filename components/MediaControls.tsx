@@ -1,7 +1,10 @@
-"use client";
-
 import React from "react";
-import { FaStepBackward, FaPlay, FaPause, FaStepForward } from "react-icons/fa";
+import {
+  MdSkipPrevious,
+  MdPlayArrow,
+  MdPause,
+  MdSkipNext,
+} from "react-icons/md";
 
 interface MediaControlsProps {
   isPlaying: boolean;
@@ -9,6 +12,7 @@ interface MediaControlsProps {
   pauseSong: () => void;
   nextSong: () => void;
   previousSong: () => void;
+  className?: string;
 }
 
 export const MediaControls: React.FC<MediaControlsProps> = ({
@@ -17,6 +21,7 @@ export const MediaControls: React.FC<MediaControlsProps> = ({
   pauseSong,
   nextSong,
   previousSong,
+  className,
 }) => {
   const togglePlayPause = () => {
     if (isPlaying) {
@@ -27,15 +32,27 @@ export const MediaControls: React.FC<MediaControlsProps> = ({
   };
 
   return (
-    <div className="absolute bottom-4 left-4 z-20 flex items-center space-x-4">
-      <button onClick={previousSong} className="p-2 rounded">
-        <FaStepBackward color="white" />
+    <div
+      className={`absolute bottom-4 left-4 z-20 flex items-center space-x-4 ${className}`}
+    >
+      <button
+        onClick={previousSong}
+        className="focus:outline-none bg-transparent"
+      >
+        <MdSkipPrevious className="text-white retro-glow" size={24} />
       </button>
-      <button onClick={togglePlayPause} className="p-2 rounded">
-        {isPlaying ? <FaPause color="white" /> : <FaPlay color="white" />}
+      <button
+        onClick={togglePlayPause}
+        className="focus:outline-none bg-transparent"
+      >
+        {isPlaying ? (
+          <MdPause className="text-white retro-glow" size={30} />
+        ) : (
+          <MdPlayArrow className="text-white retro-glow" size={30} />
+        )}
       </button>
-      <button onClick={nextSong} className="p-2 rounded">
-        <FaStepForward color="white" />
+      <button onClick={nextSong} className="focus:outline-none bg-transparent">
+        <MdSkipNext className="text-white retro-glow" size={24} />
       </button>
     </div>
   );

@@ -36,7 +36,7 @@ export default function Home() {
         newAudio.removeEventListener("ended", handleSongEnd);
       };
     }
-  }, [songs]);
+  }, [songs, audio, currentSong, volume]);
 
   const playSong = () => {
     audio?.play();
@@ -78,10 +78,6 @@ export default function Home() {
           console.error("Error playing audio:", error);
           setIsPlaying(false);
         }
-
-        return () => {
-          newAudio.removeEventListener("ended", handleSongEnd);
-        };
       }
     } catch (error) {
       console.error("Error changing song:", error);
@@ -112,14 +108,9 @@ export default function Home() {
       >
         <source src="/videos/anime-visuals.mp4" type="video/mp4" />
       </video>
-      <div className="absolute bottom-0 left-0 p-4 ">
-        <h2
-          className="text-white pb-11 font-mono text-sm"
-          style={{ fontFamily: "'JetBrains Mono', sans-serif" }}
-        >
-          Now Playing:
-          <br />
-          {songs[currentSong]?.title}
+      <div className="absolute bottom-0 left-0 p-4">
+        <h2 className="text-white pb-9 text-lg font-thin">
+          {songs[currentSong]?.title}...
         </h2>
         <MediaControls
           isPlaying={isPlaying}
@@ -127,6 +118,7 @@ export default function Home() {
           pauseSong={pauseSong}
           nextSong={nextRandomSong}
           previousSong={previousSong}
+          className="retro-glow"
         />
       </div>
     </div>

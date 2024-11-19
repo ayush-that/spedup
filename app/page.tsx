@@ -13,55 +13,75 @@ export default function Home() {
   const [hasStarted, setHasStarted] = useState(false);
   const [songHistory, setSongHistory] = useState<number[]>([]);
 
+  const handleSongEndRef = useRef<() => void>();
+  const handleWaitingRef = useRef<() => void>();
+  const handlePlayingRef = useRef<() => void>();
+
   const nextRandomSongRef = useRef<() => void>();
 
-  const handleSongEnd = useCallback(() => {
-    if (nextRandomSongRef.current) {
-      nextRandomSongRef.current();
-    }
-  }, []);
-
+  // Initialize handler functions
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    handleSongEndRef.current = () => {
+      if (nextRandomSongRef.current) {
+        nextRandomSongRef.current();
+      }
+    };
 
-    const handleWaiting = () => {
+    handleWaitingRef.current = () => {
       setIsBuffering(true);
     };
 
-    const handlePlaying = () => {
+    handlePlayingRef.current = () => {
       setIsBuffering(false);
     };
-
-    audio.addEventListener("ended", handleSongEnd);
-    audio.addEventListener("waiting", handleWaiting);
-    audio.addEventListener("playing", handlePlaying);
-
-    return () => {
-      audio.removeEventListener("ended", handleSongEnd);
-      audio.removeEventListener("waiting", handleWaiting);
-      audio.removeEventListener("playing", handlePlaying);
-    };
-  }, [handleSongEnd]);
+  }, []);
 
   const changeSong = useCallback(
     async (newIndex: number, addToHistory: boolean = true) => {
       try {
         if (audioRef.current) {
           audioRef.current.pause();
+          if (handleSongEndRef.current) {
+            audioRef.current.removeEventListener(
+              "ended",
+              handleSongEndRef.current
+            );
+          }
+          if (handleWaitingRef.current) {
+            audioRef.current.removeEventListener(
+              "waiting",
+              handleWaitingRef.current
+            );
+          }
+          if (handlePlayingRef.current) {
+            audioRef.current.removeEventListener(
+              "playing",
+              handlePlayingRef.current
+            );
+          }
           audioRef.current.src = "";
           audioRef.current.load();
-          audioRef.current.removeEventListener("ended", handleSongEnd);
         }
 
         if (addToHistory) {
+          // Add the current song to the history before changing
           setSongHistory((prevHistory) => [...prevHistory, currentSong]);
         }
 
         if (songs[newIndex]) {
           const newAudio = new Audio(songs[newIndex].src);
           newAudio.volume = volume;
-          newAudio.addEventListener("ended", handleSongEnd);
+
+          // Attach event listeners using the handlers from refs
+          if (handleSongEndRef.current) {
+            newAudio.addEventListener("ended", handleSongEndRef.current);
+          }
+          if (handleWaitingRef.current) {
+            newAudio.addEventListener("waiting", handleWaitingRef.current);
+          }
+          if (handlePlayingRef.current) {
+            newAudio.addEventListener("playing", handlePlayingRef.current);
+          }
 
           audioRef.current = newAudio;
           setCurrentSong(newIndex);
@@ -74,9 +94,10 @@ export default function Home() {
         console.error("Error changing song:", error);
       }
     },
-    [currentSong, songs, volume, handleSongEnd]
+    [currentSong, songs, volume]
   );
 
+  // Define nextRandomSong and store it in ref
   const nextRandomSong = useCallback(() => {
     if (songs.length > 0) {
       const nextSongIndex = getRandomIndex(songs.length);
@@ -88,8 +109,10 @@ export default function Home() {
     nextRandomSongRef.current = nextRandomSong;
   }, [nextRandomSong]);
 
+  // Define togglePlayPause function
   const togglePlayPause = useCallback(async () => {
     if (!audioRef.current && songs.length > 0) {
+      // If audio is not initialized, start playing the current song
       await changeSong(currentSong);
       return;
     }
@@ -110,19 +133,22 @@ export default function Home() {
     }
   }, [isPlaying, songs.length, changeSong, currentSong]);
 
+  // Define previousSong function
   const previousSong = useCallback(() => {
     setSongHistory((prevHistory) => {
       if (prevHistory.length > 0) {
         const lastSongIndex = prevHistory[prevHistory.length - 1];
-        changeSong(lastSongIndex, false);
+        changeSong(lastSongIndex, false); // Do not add to history when going back
         return prevHistory.slice(0, -1);
       }
       return prevHistory;
     });
   }, [changeSong]);
 
+  // Define getRandomIndex helper function
   const getRandomIndex = (length: number) => Math.floor(Math.random() * length);
 
+  // Define nextRandomSongCallback for MediaControls
   const nextRandomSongCallback = useCallback(() => {
     if (songs.length > 0) {
       const nextSongIndex = getRandomIndex(songs.length);
@@ -130,6 +156,7 @@ export default function Home() {
     }
   }, [songs.length, changeSong]);
 
+  // Handle keyboard events
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.code === "Space" && !e.repeat) {
@@ -148,17 +175,37 @@ export default function Home() {
     return () => document.removeEventListener("keydown", handleKeyPress);
   }, [togglePlayPause, nextRandomSongCallback, previousSong]);
 
+  // Cleanup on component unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
         audioRef.current.load();
-        audioRef.current.removeEventListener("ended", handleSongEnd);
+        // Remove event listeners
+        if (handleSongEndRef.current) {
+          audioRef.current.removeEventListener(
+            "ended",
+            handleSongEndRef.current
+          );
+        }
+        if (handleWaitingRef.current) {
+          audioRef.current.removeEventListener(
+            "waiting",
+            handleWaitingRef.current
+          );
+        }
+        if (handlePlayingRef.current) {
+          audioRef.current.removeEventListener(
+            "playing",
+            handlePlayingRef.current
+          );
+        }
       }
     };
-  }, [handleSongEnd]);
+  }, []);
 
+  // Fetch songs on component mount
   useEffect(() => {
     const fetchSongs = async () => {
       try {
@@ -186,7 +233,7 @@ export default function Home() {
       >
         <source src="/videos/anime-visuals.mp4" type="video/mp4" />
       </video>
-      <div className="absolute top-0 left-0 p-4">
+      <div className="absolute bottom-0 left-0 p-4">
         <h2 className="text-white pb-9 text-lg font-thin">
           {!hasStarted
             ? "Press space to play"

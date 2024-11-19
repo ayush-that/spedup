@@ -41,10 +41,7 @@ export const MediaControls: React.FC<MediaControlsProps> = ({
 
   return (
     <div className={className}>
-      {isBuffering && <span>Buffering...</span>}
-      <div
-        className={`absolute bottom-4 left-4 z-20 flex items-center space-x-4 ${className}`}
-      >
+      <div className="flex items-center justify-center space-x-4">
         <button
           onClick={previousSong}
           className="focus:outline-none bg-transparent"

@@ -233,8 +233,8 @@ export default function Home() {
       >
         <source src="/videos/anime-visuals.mp4" type="video/mp4" />
       </video>
-      <div className="absolute bottom-0 left-0 p-4">
-        <h2 className="text-white pb-9 text-lg font-thin">
+      <div className="absolute top-0 w-full flex flex-col items-center p-4">
+        <h2 className="text-white pb-2 text-xl font-thin">
           {!hasStarted
             ? "Press space to play"
             : isBuffering

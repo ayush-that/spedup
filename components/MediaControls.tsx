@@ -6,12 +6,16 @@ import {
   MdSkipNext,
 } from "react-icons/md";
 
-interface MediaControlsProps {
+export interface MediaControlsProps {
   isPlaying: boolean;
-  playSong: () => void;
-  pauseSong: () => void;
+  playSong: () => Promise<void>;
+  pauseSong: () => Promise<void>;
   nextSong: () => void;
   previousSong: () => void;
+  isBuffering: boolean;
+  hasStarted: boolean;
+  currentSong: number;
+  songs: { title: string; src: string }[];
   className?: string;
 }
 
@@ -21,6 +25,10 @@ export const MediaControls: React.FC<MediaControlsProps> = ({
   pauseSong,
   nextSong,
   previousSong,
+  isBuffering,
+  hasStarted,
+  currentSong,
+  songs,
   className,
 }) => {
   const togglePlayPause = () => {
@@ -32,28 +40,34 @@ export const MediaControls: React.FC<MediaControlsProps> = ({
   };
 
   return (
-    <div
-      className={`absolute bottom-4 left-4 z-20 flex items-center space-x-4 ${className}`}
-    >
-      <button
-        onClick={previousSong}
-        className="focus:outline-none bg-transparent"
+    <div className={className}>
+      {isBuffering && <span>Buffering...</span>}
+      <div
+        className={`absolute bottom-4 left-4 z-20 flex items-center space-x-4 ${className}`}
       >
-        <MdSkipPrevious className="text-white retro-glow" size={24} />
-      </button>
-      <button
-        onClick={togglePlayPause}
-        className="focus:outline-none bg-transparent"
-      >
-        {isPlaying ? (
-          <MdPause className="text-white retro-glow" size={30} />
-        ) : (
-          <MdPlayArrow className="text-white retro-glow" size={30} />
-        )}
-      </button>
-      <button onClick={nextSong} className="focus:outline-none bg-transparent">
-        <MdSkipNext className="text-white retro-glow" size={24} />
-      </button>
+        <button
+          onClick={previousSong}
+          className="focus:outline-none bg-transparent"
+        >
+          <MdSkipPrevious className="text-white retro-glow" size={24} />
+        </button>
+        <button
+          onClick={togglePlayPause}
+          className="focus:outline-none bg-transparent"
+        >
+          {isPlaying ? (
+            <MdPause className="text-white retro-glow" size={30} />
+          ) : (
+            <MdPlayArrow className="text-white retro-glow" size={30} />
+          )}
+        </button>
+        <button
+          onClick={nextSong}
+          className="focus:outline-none bg-transparent"
+        >
+          <MdSkipNext className="text-white retro-glow" size={24} />
+        </button>
+      </div>
     </div>
   );
 };

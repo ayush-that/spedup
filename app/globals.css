@@ -111,3 +111,9 @@ body {
   user-select: none;
   -webkit-touch-callout: none;
 }
+
+body * {
+  pointer-events: auto !important;
+  -webkit-context-menu: none;
+  -webkit-touch-callout: none;
+}

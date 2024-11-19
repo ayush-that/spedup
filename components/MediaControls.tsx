@@ -46,23 +46,23 @@ export const MediaControls: React.FC<MediaControlsProps> = ({
           onClick={previousSong}
           className="focus:outline-none bg-transparent"
         >
-          <MdSkipPrevious className="text-white retro-glow" size={30} />
+          <MdSkipPrevious className="text-white" size={30} />
         </button>
         <button
           onClick={togglePlayPause}
           className="focus:outline-none bg-transparent"
         >
           {isPlaying ? (
-            <MdPause className="text-white retro-glow" size={30} />
+            <MdPause className="text-white" size={30} />
           ) : (
-            <MdPlayArrow className="text-white retro-glow" size={30} />
+            <MdPlayArrow className="text-white" size={30} />
           )}
         </button>
         <button
           onClick={nextSong}
           className="focus:outline-none bg-transparent"
         >
-          <MdSkipNext className="text-white retro-glow" size={30} />
+          <MdSkipNext className="text-white" size={30} />
         </button>
       </div>
     </div>

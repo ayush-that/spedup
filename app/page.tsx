@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { MediaControls } from "@/components/MediaControls";
+import { CloudWrapper } from "@/components/CloudWrapper";
+import { MdGraphicEq } from "react-icons/md";
+
+const VIDEO_PATHS = [
+  "/videos/anime-visuals.mp4",
+  "/videos/anime-visuals2.mp4",
+] as const;
 
 export default function Home() {
   const [currentSong, setCurrentSong] = useState(0);
@@ -12,6 +19,7 @@ export default function Home() {
   const [isBuffering, setIsBuffering] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [songHistory, setSongHistory] = useState<number[]>([]);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   const handleSongEndRef = useRef<() => void>();
   const handleWaitingRef = useRef<() => void>();
@@ -131,7 +139,7 @@ export default function Home() {
     setSongHistory((prevHistory) => {
       if (prevHistory.length > 0) {
         const lastSongIndex = prevHistory[prevHistory.length - 1];
-        changeSong(lastSongIndex, false); // Do not add to history when going back
+        changeSong(lastSongIndex, false);
         return prevHistory.slice(0, -1);
       }
       return prevHistory;
@@ -147,6 +155,10 @@ export default function Home() {
     }
   }, [songs.length, changeSong]);
 
+  const toggleVideo = useCallback(() => {
+    setCurrentVideoIndex((current) => (current === 0 ? 1 : 0));
+  }, []);
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.code === "Space" && !e.repeat) {
@@ -158,12 +170,15 @@ export default function Home() {
       } else if (e.code === "ArrowLeft" && !e.repeat) {
         e.preventDefault();
         previousSong();
+      } else if (e.code === "KeyG" && !e.repeat) {
+        e.preventDefault();
+        toggleVideo();
       }
     };
 
     document.addEventListener("keydown", handleKeyPress);
     return () => document.removeEventListener("keydown", handleKeyPress);
-  }, [togglePlayPause, nextRandomSongCallback, previousSong]);
+  }, [togglePlayPause, nextRandomSongCallback, previousSong, toggleVideo]);
 
   useEffect(() => {
     return () => {
@@ -213,33 +228,37 @@ export default function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       <video
+        key={VIDEO_PATHS[currentVideoIndex]} // Force remount on source change
         className="absolute inset-0 w-full h-full object-cover"
         autoPlay
         muted
         loop
+        playsInline
       >
-        <source src="/videos/anime-visuals.mp4" type="video/mp4" />
+        <source src={VIDEO_PATHS[currentVideoIndex]} type="video/mp4" />
       </video>
-      <div className="absolute pt-16 top-0 w-full flex flex-col items-center p-4">
-        <h2 className="text-white pb-2 text-lg font-neon-glow font-thin">
-          {!hasStarted
-            ? 'press "space" to play'
-            : isBuffering
-            ? "Buffering..."
-            : `${songs[currentSong]?.title}...`}
-        </h2>
-        <MediaControls
-          isPlaying={isPlaying}
-          playSong={togglePlayPause}
-          pauseSong={togglePlayPause}
-          nextSong={nextRandomSong}
-          previousSong={previousSong}
-          isBuffering={isBuffering}
-          hasStarted={hasStarted}
-          currentSong={currentSong}
-          songs={songs}
-          className="retro-glow"
-        />
+      <div className="absolute top-0 w-full flex flex-col items-center p-4">
+        <CloudWrapper>
+          <h2 className="text-white pb-2 text-lg font-neon-glow font-thin text-center flex items-center justify-center">
+            <MdGraphicEq className="icon-equalizer text-white mr-2" size={24} />
+            {isBuffering
+              ? "Buffering..."
+              : songs[currentSong]?.title
+              ? `${songs[currentSong].title}...`
+              : "No song selected"} 
+          </h2>
+          <MediaControls
+            isPlaying={isPlaying}
+            playSong={togglePlayPause}
+            pauseSong={togglePlayPause}
+            nextSong={nextRandomSong}
+            previousSong={previousSong}
+            isBuffering={isBuffering}
+            hasStarted={hasStarted}
+            currentSong={currentSong}
+            songs={songs}
+          />
+        </CloudWrapper>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
 
 @layer base {
   :root {
@@ -104,6 +104,18 @@ body::before {
   }
 }
 
+@keyframes equalizer {
+
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(1.5);
+  }
+}
+
 body {
   -webkit-user-select: none;
   -ms-user-select: none;
@@ -153,6 +165,44 @@ body * {
   }
 }
 
+.icon-equalizer {
+  animation: equalizer 1s infinite;
+  transform-origin: bottom;
+}
+
 .font-neon-glow {
   animation: vibrantGlow 5s infinite ease-in-out;
+}
+
+.cloud-wrapper {
+  position: relative;
+  display: inline-block;
+  padding: 20px 30px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 100px;
+  z-index: 0;
+}
+
+.cloud-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 120px;
+}
+
+.cloud-content {
+  position: relative;
+  padding: 40px 20px 20px 20px;
+}
+
+@media (max-width: 600px) {
+  .cloud-svg {
+    width: 150px;
+    height: 90px;
+  }
+
+  .cloud-content {
+    padding: 30px 15px 15px 15px;
+  }
 }
